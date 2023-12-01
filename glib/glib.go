@@ -766,7 +766,11 @@ func (v *Object) Emit(s string, retType Type, args ...interface{}) (interface{},
 		return nil, errors.New("Error creating Value for return value")
 	}
 	C.g_signal_emitv(valv, id, C.GQuark(0), ret.native())
-
+	// avoid conversion of expected returned non value
+	if retType == TYPE_NONE && !ret.IsValue() {
+		return nil, err
+	}
+	// otherwise convert to go value
 	return ret.GoValue()
 }
 
